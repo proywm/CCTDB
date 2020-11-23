@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[57]:
+# In[11]:
 
 
 from neo4j import GraphDatabase
@@ -79,6 +79,7 @@ class neo4jData:
         result = tx.run("CREATE (a:ROOT) " 
                         "SET a.nodeId = $nodeId ", nodeId=nodeId)
     
+    #NOT USED
     @staticmethod
     def createUpdateNode(tx, data, dataCount, nodeId):
         result = tx.run("MATCH (a:Node) "
@@ -86,10 +87,12 @@ class neo4jData:
                         "SET a.dataCount = $dataCount "
                         "SET a.nodeId = $nodeId ", data=data, dataCount=dataCount, nodeId=nodeId)
         
+    #NOT USED
     def updateNode(self, data, dataCount, nodeId):
         with self.driver.session() as session:
             node = session.write_transaction(self.createUpdateNode, data, dataCount, nodeId)
     
+    #NOT USED
     @staticmethod
     def createUpdateLeaf(tx, nodeId, cycles, samples, cycleAverage, cycleStDeviation):
         result = tx.run("MATCH (a:Node) "
@@ -100,7 +103,7 @@ class neo4jData:
                         "SET a.cycleStDeviation = $cycleStDeviation ", 
                         nodeId=nodeId, cycles=cycles, samples=samples, cycleAverage=cycleAverage, 
                         cycleStDeviation=cycleStDeviation)
-        
+    #NOT USED    
     def updateLeaf(self, nodeId, cycles, samples, cycleAverage, cycleStDeviation):
         with self.driver.session() as session:
             node = session.write_transaction(self.createUpdateLeaf, nodeId, cycles, samples, cycleAverage, cycleStDeviation)
@@ -136,6 +139,7 @@ class neo4jData:
         #print(count)        
         return count 
     
+    #NOT USED
     def updateSampleCount(self, nodeId):
         findData = "MATCH (a:Node) RETURN a.nodeId, a.dataCount"
         
@@ -155,6 +159,7 @@ class neo4jData:
         #print(count)        
         return count
     
+    #NOT USED
     def findNodeData(self, nodeId):
         findData = "MATCH (a:Node) RETURN a.data"
         
@@ -167,59 +172,23 @@ class neo4jData:
                     
         return nodeData
     
-    @staticmethod 
-    def resultChildPath(tx, parentNodeId, childNodeId):
-        result = tx.run("MATCH (b:Node)-[:child]->(a:Node) " 
-                        "WHERE a.data = 'Root' AND b.nodeId = $nodeId "
-                        "RETURN (b:Node)-[:child]->(a:Node) ",parentNodeId=parentNodeId, childNodeId=childNodeId)
-                        #idea above!!!!!!
-        
-        #result = tx.run("MATCH path = (a:Node {data:'Root'})-[child*]->(leaf) "
-                        #"WHERE NOT (leaf)-->() "
-                        #"RETURN path ")
-        
-    def findChildPath(self,parentNodeId, childNodeId):
-        with self.driver.session() as session:
-            results = session.write_transaction(self.resultChildPath,parentNodeId, childNodeId)
-            
-            #for record in results:
-                #nodes = record["path"].nodes
-            for node in results:
-                print(node + "->")
-    
-    @staticmethod 
-    def resultCheckPathExist(tx, parentNodeId, childNodeId):
-        result = tx.run("MATCH (a:Node)-[:child]->(b:Node) " 
-                        "WHERE a.nodeId = $parentNodeId AND b.nodeId = $childNodeId "
-                        "RETURN a.data ",parentNodeId=parentNodeId, childNodeId=childNodeId)
-        
-        #result = tx.run("MATCH path = (a:Node {data:'Root'})-[child*]->(leaf) "
-                        #"WHERE NOT (leaf)-->() "
-                        #"RETURN path ")
-        
-    def checkPathExist(self,parentNodeId, childNodeId):
-        with self.driver.session() as session:
-            results = session.write_transaction(self.resultCheckPathExist,parentNodeId, childNodeId)
-            
-            #for record in results:
-                #nodes = record["path"].nodes
-            for exists in results:
-                print(exists)
-    
     def deleteAllNodes(self):
         deleteAll = "MATCH (a) DETACH DELETE a"
         
         with self.driver.session() as session:
             deleted = session.run(deleteAll)
     
+    #NOT USED
     @staticmethod 
     def deleteSpecificNode(tx):
         result = tx.run('MATCH (a:Node {data: "PLACEHOLDER FOR IF 1 PROCESS"}) DETACH DELETE a ')
-            
+    
+    #NOT USED
     def inDeleteSpecificNode(self):
         with self.driver.session() as session:
             node = session.write_transaction(self.deleteSpecificNode)
     
+    #NOT USED
     def printNodes(self):
         nodeQuery = "MATCH (a:Node) RETURN a"
         
@@ -231,7 +200,7 @@ class neo4jData:
     
 
 
-# In[58]:
+# In[12]:
 
 
 neoData = neo4jData("bolt://localhost:7687", "neo4j", "test")
@@ -464,7 +433,7 @@ class Tree:
                                
 
 
-# In[59]:
+# In[13]:
 
 
 inFile = open('out.txt', 'r')
@@ -474,23 +443,15 @@ data = ""
 kernel = ""
 cycles = 0
 samples = 0
-someBool = True
-cycleList = []
 cycleAverage = 0
 cycleStDeviation = 0
-previousLeaf = []
-allCycles = []
-leafCount = 0
 #bool for if there are no processes
 hasNoProcesses = []
 hasNoProcesses.append("x")
 processCount = 0
-refinedCycles = []
 
 theTree = Tree()
 parent = theTree.createNode("Root", "", "",0,0,0)
-
-#neoData.insertNode(" ", "Root", " ", nodeId, 0,0,0,0,0)
 
 #read file from bottom to top
 for line in reversed(list(inFile)):
@@ -504,11 +465,6 @@ for line in reversed(list(inFile)):
     
     if not line.strip():
         continue
-    
-    #if len(lineSplit) < 4:
-        #for x in range (0, 3):
-            #lineSplit.append('')
-    #print(lineSplit)
     
     if lineSplit[0] != '':  
         address = lineSplit[0]
@@ -562,10 +518,10 @@ for line in reversed(list(inFile)):
     #print(parent.data,"->", returnNode.data)
     parent = theTree.insertChild(parent, returnNode)
     
-#print(refinedCycles)
+
 theTree.insertIntoGraphDFS(theTree.root, nodeId, refinedCycles)
 #theTree.testPrint(theTree.root) 
-#print(allCycles)
+
 neoData.close()
 inFile.close()
 
