@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[11]:
+# In[7]:
 
 
 from neo4j import GraphDatabase
@@ -200,7 +200,7 @@ class neo4jData:
     
 
 
-# In[12]:
+# In[8]:
 
 
 neoData = neo4jData("bolt://localhost:7687", "neo4j", "test")
@@ -322,7 +322,7 @@ class Tree:
                 child.probability = child.count / root.count
             self.calculateProbability(child)
     
-    def insertIntoGraphDFS(self, root, parentId, refinedCycles, arrow="", prob=1):
+    def insertIntoGraphDFS(self, root, parentId, arrow="", prob=1):
         #global loopCount
         
         if root is None:# or root.data.upper() == "EOS":
@@ -353,7 +353,7 @@ class Tree:
        
                  
         for child in sorted(root.children):
-            self.insertIntoGraphDFS(child, parentId, refinedCycles, arrow, prob * root.probability)
+            self.insertIntoGraphDFS(child, parentId, arrow, prob * root.probability)
             
         if len(root.children) == 0:
             
@@ -433,10 +433,10 @@ class Tree:
                                
 
 
-# In[13]:
+# In[9]:
 
 
-inFile = open('out.txt', 'r')
+inFile = open('out.swf', 'r')
 
 address = ""
 data = ""
@@ -519,7 +519,7 @@ for line in reversed(list(inFile)):
     parent = theTree.insertChild(parent, returnNode)
     
 
-theTree.insertIntoGraphDFS(theTree.root, nodeId, refinedCycles)
+theTree.insertIntoGraphDFS(theTree.root, nodeId)
 #theTree.testPrint(theTree.root) 
 
 neoData.close()
