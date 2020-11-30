@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
+# In[1]:
 
+
+#Code Created By: Alexander Kostoff
+#Last UpdateL 11/29/2020
 
 from neo4j import GraphDatabase
 
 
-# In[19]:
+# In[3]:
 
 
 class graphNeo:

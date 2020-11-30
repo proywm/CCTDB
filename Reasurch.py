@@ -4,6 +4,8 @@
 # In[7]:
 
 
+#Code Created By: Alexander Kostoff
+#Last UpdateL 11/29/2020
 from neo4j import GraphDatabase
 import numpy as np
 import math
@@ -74,6 +76,7 @@ class neo4jData:
         with self.driver.session() as session:
             relation = session.write_transaction(self.deleteParentRelation, parentNodeId, childNodeId)
     
+    #NOT USED
     @staticmethod
     def createRoot(tx, nodeId):
         result = tx.run("CREATE (a:ROOT) " 
@@ -120,6 +123,7 @@ class neo4jData:
                 
         return theReturn
     
+    #NOT USED
     def updateDataCount(self, data):
         findData = "MATCH (a:Node) RETURN a.data, a.dataCount"
         
@@ -172,6 +176,7 @@ class neo4jData:
                     
         return nodeData
     
+    #NOT USED
     def deleteAllNodes(self):
         deleteAll = "MATCH (a) DETACH DELETE a"
         
@@ -338,7 +343,7 @@ class Tree:
         arrow = arrow + "->"
         global nodeId
         nodeId = nodeId + 1
-        #dataCount = neoData.updateDataCount(root.data.upper())
+        
         global samples
         samples = root.count
         #if dataCount == 1:
